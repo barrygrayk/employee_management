@@ -1,9 +1,9 @@
 import uuid
 
-from django.db import models
-
 from apps.employees.enums import SENIORITY_CHOICES, SeniorityLevel
 from apps.employees.utils import generate_employee_code
+from django.db import models
+from django.utils import timezone
 
 
 class Skill(models.Model):
@@ -42,6 +42,7 @@ class Employee(models.Model):
     mobile_number = models.CharField(max_length=15)
     email_address = models.EmailField(max_length=254)
     street_address = models.CharField(max_length=100)
+    date_of_birth = models.DateField(default=timezone.now)
     city = models.CharField(max_length=50)
     postal_code = models.CharField(max_length=10)
     country = models.CharField(max_length=50)

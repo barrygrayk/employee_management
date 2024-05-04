@@ -23,7 +23,7 @@ class SkillViewSetTestCase(APITestCase):
         """
         Test that a GET request to /skills/ returns a 200 status code
         """
-        response = self.client.get("/skills/")
+        response = self.client.get("/api/skills/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_skill_not_allowed(self):
@@ -32,7 +32,7 @@ class SkillViewSetTestCase(APITestCase):
         (Method Not Allowed)
         """
         data = {"name": "Python", "years_of_experience": 1, "seniority": "JR"}
-        response = self.client.post("/skills/", data=data)
+        response = self.client.post("/api/skills/", data=data)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_skill_not_found(self):
@@ -40,7 +40,7 @@ class SkillViewSetTestCase(APITestCase):
         Test that a GET request to /skills/{id}/ returns a 404 status code
         when the skill does not exist
         """
-        response = self.client.get("/skills/999999/")  # Use an ID that does not exist
+        response = self.client.get("/api/skills/999999/")  # Use an ID that does not exist
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -56,7 +56,7 @@ class EmployeeViewSetTestCase(APITestCase):
         """
         Test that a GET request to /employees/ returns a 200 status code
         """
-        response = self.client.get("/employees/")
+        response = self.client.get("/api/employees/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_employee(self):
@@ -64,7 +64,7 @@ class EmployeeViewSetTestCase(APITestCase):
         Test that a GET request to /employees/{id}/ returns the correct
         employee
         """
-        response = self.client.get(f"/employees/{self.employee.id}/")
+        response = self.client.get(f"/api/employees/{self.employee.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["first_name"], self.employee.first_name)
         self.assertEqual(response.data["last_name"], self.employee.last_name)
@@ -80,13 +80,14 @@ class EmployeeViewSetTestCase(APITestCase):
             "mobile_number": "1234567890",
             "email_address": "ben.doe@example.com",
             "street_address": "123 Main St",
+            "date_of_birth": "1990-01-01",
             "city": "Anytown",
             "postal_code": "12345",
             "country": "Zambia",
             "skills": [{"name": "test", "years_of_experience": 1, "seniority": "JR"}],
         }
         response = self.client.post(
-            "/employees/",
+            "/api/employees/",
             data=json.dumps(employee_data),
             content_type="application/json",
         )
@@ -105,12 +106,13 @@ class EmployeeViewSetTestCase(APITestCase):
             "email_address": "sammy.doe@example.com",
             "street_address": "456 Main St",
             "city": "Anytown",
+             "date_of_birth": "1990-01-01",
             "postal_code": "54321",
             "country": "Zambia",
             "skills": [{"name": "Python", "years_of_experience": 1, "seniority": "JR"}],
         }
         response = self.client.put(
-            f"/employees/{employee.id}/",
+            f"/api/employees/{employee.id}/",
             data=json.dumps(updated_employee_data),
             content_type="application/json",
         )
@@ -124,7 +126,7 @@ class EmployeeViewSetTestCase(APITestCase):
         returns a 204 No Content status code
         """
         employee = EmployeeFactory()
-        response = self.client.delete(f"/employees/{employee.id}/")
+        response = self.client.delete(f"/api/employees/{employee.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_create_employee_with_missing_fields(self):
@@ -140,7 +142,7 @@ class EmployeeViewSetTestCase(APITestCase):
             "postal_code": "12345",
         }
         response = self.client.post(
-            "/employees/",
+            "/api/employees/",
             data=json.dumps(employee_data_with_missing_fields_1),
             content_type="application/json",
         )
@@ -156,7 +158,7 @@ class EmployeeViewSetTestCase(APITestCase):
             "country": "Zambia",
         }
         response = self.client.post(
-            "/employees/",
+            "/api/employees/",
             data=json.dumps(employee_data_with_missing_fields_2),
             content_type="application/json",
         )
@@ -172,7 +174,7 @@ class EmployeeViewSetTestCase(APITestCase):
         EmployeeFactory(
             first_name="Jane", last_name="Doe", email_address="jane.doe@example.com"
         )
-        response = self.client.get("/employees/", {"search": "john"})
+        response = self.client.get("/api/employees/", {"search": "john"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["first_name"], "John")
@@ -188,7 +190,7 @@ class EmployeeViewSetTestCase(APITestCase):
             first_name="Jane", last_name="Doe", email_address="jane.doe@example.com"
         )
         response = self.client.get(
-            "/employees/", {"email_address": "john.doe@example.com"}
+            "/api/employees/", {"email_address": "john.doe@example.com"}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)
@@ -208,6 +210,7 @@ class EmployeeViewSetTestCase(APITestCase):
             "city": "Anytown",
             "postal_code": "54321",
             "country": "Zambia",
+             "date_of_birth": "1990-01-01",
             "skills": [
                 {
                     "name": skill.name,
@@ -225,6 +228,7 @@ class EmployeeViewSetTestCase(APITestCase):
             "city": "Anytown",
             "postal_code": "54321",
             "country": "Zambia",
+            "date_of_birth": "1990-01-01",
             "skills": [
                 {
                     "name": skill.name,
@@ -234,10 +238,10 @@ class EmployeeViewSetTestCase(APITestCase):
             ],
         }
         response_1 = self.client.post(
-            "/employees/", data=employee_data_1, format="json"
+            "/api/employees/", data=employee_data_1, format="json"
         )
         response_2 = self.client.post(
-            "/employees/", data=employee_data_2, format="json"
+            "/api/employees/", data=employee_data_2, format="json"
         )
         self.assertEqual(response_1.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_2.status_code, status.HTTP_201_CREATED)

@@ -25,6 +25,7 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     city = factory.Faker("city")
     postal_code = factory.Faker("postcode")
     country = factory.Faker("country")
+    date_of_birth = factory.Faker('date_of_birth')
 
     @factory.post_generation
     def skills(self, create, extracted, **kwargs):
