@@ -33,6 +33,7 @@
             placeholder="Pick a date"
             v-model="employeeForm.dateOfBirth"
             style="width: 100%"
+            format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
       </el-col>
@@ -70,8 +71,8 @@
           :prop="'skills.' + index + '.name'"
           :rules="{
             required: true,
-            message: 'domain can not be null',
-            trigger: 'change',
+            message: 'Name is required',
+            trigger: 'blur',
           }"
         >
           <el-input v-model="skill.name"></el-input>
@@ -81,6 +82,11 @@
         <el-form-item
           label="Yrs Exp"
           :prop="'skills.' + index + '.yearsOfExperience'"
+          :rules="{
+            required: true,
+            message: 'Yrs Exp is required',
+            trigger: 'blur',
+          }"
         >
           <el-input v-model="skill.yearsOfExperience"></el-input>
         </el-form-item>
@@ -89,6 +95,12 @@
         <el-form-item
           label="Seniority"
           :prop="'skills.' + index + '.seniority'"
+          :rules="{
+            required: true,
+            message: 'Seniority is required',
+            trigger: 'blur',
+          }"
+
         >
           <el-select v-model="skill.seniority" placeholder="Select">
             <el-option
@@ -126,7 +138,7 @@
         <el-button
           v-loading="loading"
           type="primary"
-          @click="createEmployee('employeeForm')"
+          @click="onSubmitEmployee('employeeForm')"
           >Save and Add Skill</el-button
         >
       </el-col>
@@ -135,6 +147,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'EmployeeForm',
   data() {
@@ -156,6 +169,7 @@ export default {
         },
       ],
       employeeForm: {
+        id: '',
         firstName: '',
         lastName: '',
         dateOfBirth: '',
@@ -192,7 +206,7 @@ export default {
             type: 'date',
             required: true,
             message: 'Please pick a date of birth',
-            trigger: 'change',
+            trigger: 'blur',
           },
         ],
         emailAddress: [
@@ -204,14 +218,14 @@ export default {
           {
             type: 'email',
             message: 'Please input correct email address',
-            trigger: ['blur', 'change'],
+            trigger: 'blur',
           },
         ],
         streetAddress: [
           {
             required: true,
             message: 'Please enter your street address',
-            trigger: 'change',
+            trigger: 'blur',
           },
         ],
         city: [
@@ -258,6 +272,47 @@ export default {
       type: String,
       default: null,
     },
+    selectedEmployee: {
+      type: Object,
+      default: null,
+    },
+  },
+  async mounted() {
+    if (this.selectedEmployee) {
+      this.employeeForm = this.selectedEmployee;
+      this.employeeForm.dateOfBirth = new Date(this.selectedEmployee.dateOfBirth);
+    }
+  },
+
+  watch: {
+    selectedEmployee: {
+      immediate: true,
+      handler(employee) {
+        if (employee) {
+          this.employeeForm = { ...employee };
+          this.employeeForm.dateOfBirth = new Date(employee.dateOfBirth);
+        } else {
+          this.employeeForm = {
+            id: '',
+            firstName: '',
+            lastName: '',
+            dateOfBirth: '',
+            emailAddress: '',
+            streetAddress: '',
+            city: '',
+            postalCode: '',
+            country: '',
+            skills: [
+              {
+                name: '',
+                yearsOfExperience: '',
+                seniority: '',
+              },
+            ],
+          };
+        }
+      },
+    },
   },
   methods: {
     removeSkill(item) {
@@ -273,9 +328,14 @@ export default {
         seniority: '',
       })
     },
-    createEmployee() {
+    onSubmitEmployee() {
+      console.log(this.employeeForm)
       this.$refs.employeeForm.validate((valid) => {
         if (valid) {
+          // console.log(this.employeeForm)
+          // const dateOfBirth = moment(this.employeeForm.dateOfBirth).format('YYYY-MM-DD')
+          // console.log(this.employeeForm)
+          // this.employeeForm.dateOfBirth = dateOfBirth
           this.$emit('submit', this.employeeForm)
         }
       })
