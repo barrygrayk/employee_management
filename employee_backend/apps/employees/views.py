@@ -21,3 +21,4 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     serializer_class = EmployeeSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["first_name", "last_name", "email_address"]
+    ordering_fields = ["date_of_birth", "skills__name"]

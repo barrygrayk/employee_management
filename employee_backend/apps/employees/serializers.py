@@ -25,6 +25,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "mobile_number",
             "email_address",
             "street_address",
+            "date_of_birth",
             "city",
             "postal_code",
             "country",
@@ -43,7 +44,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     def create(self, validated_data: Dict[str, Any]) -> Employee:
         skills_data = validated_data.pop("skills", None)
         employee = Employee.objects.create(**validated_data)
-        employee = self.add_eployee_skills(employee, skills_data)
+        employee = self.add_employee_skills(employee, skills_data)
         return employee
 
     def update(self, instance: Employee, validated_data: Dict[str, Any]) -> Employee:
@@ -51,12 +52,12 @@ class EmployeeSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
         if skills_data is not None:
             instance.skills.clear()
-            instance = self.add_eployee_skills(instance, skills_data)
+            instance = self.add_employee_skills(instance, skills_data)
         return instance
 
     @staticmethod
-    def add_eployee_skills(instance: Employee, skils: List[Dict[str, Any]]) -> Employee:
-        for skill in skils:
+    def add_employee_skills(instance: Employee, skills: List[Dict[str, Any]]) -> Employee:
+        for skill in skills:
             skill, created = Skill.objects.get_or_create(**skill)
             instance.skills.add(skill)
 
