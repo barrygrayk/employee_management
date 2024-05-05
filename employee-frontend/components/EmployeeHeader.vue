@@ -1,0 +1,72 @@
+<template>
+  <el-row :gutter="20">
+    <el-col :span="4">
+      <h2>Employees</h2>
+    </el-col>
+    <el-col :span="8">
+      <el-input
+        placeholder="Search"
+        v-model="searchTerm"
+        @input="onSearchFilterEmployee"
+      >
+        <i slot="prefix" class="el-input__icon el-icon-search"></i>
+      </el-input>
+    </el-col>
+    <el-col :span="4">
+      <el-select v-model="filterTerm" placeholder="Filter By" @change="onSearchFilterEmployee">
+        <el-option
+          v-for="item in filterOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        >
+        </el-option>
+      </el-select>
+    </el-col>
+    <el-col :span="4">
+      <el-button
+        type="primary"
+        round
+        icon="el-icon-plus"
+        @click="openCustomerDrawer()"
+        >Employee</el-button
+      >
+    </el-col>
+  </el-row>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      searchTerm: '',
+      filterTerm: '',
+      filterOptions: [
+        {
+          label: 'Date of Birth - ASC',
+          value: 'date_of_birth',
+        },
+        {
+          label: 'Date of Birth - DESC',
+          value: '-date_of_birth',
+        },
+        {
+          label: 'Skill - ASC',
+          value: 'skills__name',
+        },
+        {
+          label: 'Skill - DESC',
+          value: '-skills__name',
+        },
+      ],
+    }
+  },
+  methods: {
+    onSearchFilterEmployee() {
+      this.$emit('searchFilter', this.searchTerm, this.filterTerm)
+    },
+    openCustomerDrawer() {
+      this.$emit('open-drawer')
+    },
+  },
+}
+</script>
