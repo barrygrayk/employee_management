@@ -1,11 +1,15 @@
 import { mapData } from '~/utils/dataMapper';
+import { buildQueryString } from '~/utils/queryBuilder';
+import moment from 'moment';
 
 export const state = () => ({
   employees: [],
   loading: false,
-  createErrorMessage: null,
-  createSuccessMessage: null,
+  errorMessage: null,
+  successMessage: null,
 });
+
+
 
 export const mutations = {
   SET_LOADING(state, value) {
@@ -13,21 +17,26 @@ export const mutations = {
   },
   SET_EMPLOYEES(state, employees) {
     state.employees = employees;
+    state.loading = false;
   },
   CREATE_EMPLOYEE(state, employee) {
     state.employees.push(employee);
-    state.createSuccessMessage = 'Employee created successfully.'
-    state.createErrorMessage = null;
+    state.successMessage = 'Employee created successfully.'
+    state.errorMessage = null;
   },
-  CREATE_ERROR(state, message) {
-    state.createErrorMessage = message;
-    state.createSuccessMessage = null
+  ERROR(state, message) {
+    state.errorMessage = message;
+    state.successMessage = null
+    state.loading = false;
   },
   UPDATE_EMPLOYEE(state, employee) {
-    const itemIndex = state.employees.findIndex((employee) => employee.id === updatedItem.id);
+    const itemIndex = state.employees.findIndex((employee) => employee.id === employee.id);
     if (itemIndex !== -1) {
-      state.employees[itemIndex] = updatedItem;
+      state.employees[itemIndex] = employee;
     }
+    state.successMessage = 'Employee updated successfully.'
+    state.errorMessage = null;
+    state.loading = false;
   },
   DELETE_EMPLOYEE(state, employeeId) {
     state.employees = state.items.filter((item) => item.id !== itemId);
@@ -44,29 +53,46 @@ export const actions = {
   async createEmployee({ commit }, employeeData) {
     commit('SET_LOADING', true);
     let mappedEmployeeData = mapData(employeeData);
-    const response = await this.$axios.post("/employees/", mappedEmployeeData)
+    this.$axios.post("/employees/", mappedEmployeeData)
     .then((employee) => {
       commit('CREATE_EMPLOYEE', employee.data);
     })
     .catch(error => {
-      commit('CREATE_ERROR', error);
+      commit('ERROR', error);
     })
-    .finally(() => {
-      commit('SET_LOADING', false)
-    });
 
   },
   async updateEmployee({ commit }, employeeData) {
+    commit('SET_LOADING', true);
+    const dateOfBirth = moment(employeeData.dateOfBirth).format('YYYY-MM-DD')
+    employeeData.dateOfBirth = dateOfBirth;
     let mappedEmployeeData = mapData(employeeData);
-    const response = await this.$axios.put(`/employees/${itemData.id}`, mappedEmployeeData);
-    commit('UPDATE_EMPLOYEE', response.data);
-    commit('SET_ITEMS', response.data);
-    commit('SET_LOADING', false);
+    await this.$axios.put(`/employees/${employeeData.id}/`, mappedEmployeeData)
+    .then((employee) => {
+      commit('UPDATE_EMPLOYEE', employee);
+    })
+    .catch(error => {
+      commit('ERROR', error);
+    })
+  },
+
+  async searchEmployees({ commit }, terms) {
+    commit('SET_LOADING', true);
+    console.log(terms)
+    const query = buildQueryString({ search: terms.searchTerm, filter: terms.filterTerm });
+    await this.$axios.get(`/employees/?${query}`)
+      .then(response => {
+        commit('SET_EMPLOYEES', response.data);
+        commit('SET_LOADING', false);
+      })
+      .catch(error => {
+        commit('ERROR', error);
+      });
   },
   async deleteEmployee({ commit }, employeeId) {
     await this.$axios.delete(`/employees/${employeeId}`);
     commit('DELETE_EMPLOYEE', employeeId);
-    commit('SET_ITEMS', response.data);
+    commit('SET_EMPLOYEES', response.data);
     commit('SET_LOADING', false);
   },
 };

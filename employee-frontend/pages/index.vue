@@ -1,23 +1,15 @@
 <template>
   <el-container>
-    <el-header>
-      <el-row>
-        <el-col :span="16">
-          <h2>Employees</h2>
-        </el-col>
-        <el-col :span="8">
-          <el-button
-            type="primary"
-            round
-            icon="el-icon-plus"
-            @click="openCustomerDrawer()"
-            >Employee</el-button
-          >
-        </el-col>
-      </el-row>
+    <el-header style="padding: 10px">
+      <EmployeeHeader @searchFilter="handleSearchFilter"  @open-drawer="handleOpenDrawer" />
     </el-header>
     <el-main>
-      <el-table :data="employees" style="width: 100%" v-loading="loading">
+      <el-table
+        :data="employees"
+        style="width: 100%"
+        v-loading="loading"
+        @row-click="onClickEmployee"
+      >
         <el-table-column type="index" width="50"> </el-table-column>
         <el-table-column prop="first_name"> </el-table-column>
         <el-table-column prop="last_name"> </el-table-column>
@@ -46,6 +38,7 @@
         ></el-alert>
         <EmployeeForm
           :errorMessage="errorMessage"
+          :selectedEmployee="selectedEmployee"
           :successMessage="successMessage"
           :loading="loading"
           @submit="handleSubmitEmployee"
@@ -57,12 +50,14 @@
 
 <script>
 import { mapState } from 'vuex'
+import { mapData } from '~/utils/dataMapper'
 export default {
   name: 'IndexPage',
   data() {
     return {
-      drawer: false, // Add this line
-      drawerTitle: 'New Employee',
+      drawer: false,
+      drawerTitle: '',
+      selectedEmployee: null,
     }
   },
   async mounted() {
@@ -70,8 +65,8 @@ export default {
   },
   computed: {
     ...mapState({
-      errorMessage: (state) => state.employees.createErrorMessage,
-      successMessage: (state) => state.employees.createSuccessMessage,
+      errorMessage: (state) => state.employees.errorMessage,
+      successMessage: (state) => state.employees.successMessage,
       loading: (state) => state.employees.loading,
     }),
     employees() {
@@ -79,17 +74,27 @@ export default {
     },
   },
   methods: {
-    openCustomerDrawer() {
+    handleOpenDrawer() {
+      this.selectedEmployee = null
+      this.drawerTitle = 'New Employee'
       this.drawer = true
     },
-    removeSkill(item) {
-      // var index = this.employeeForm.skills.indexOf(item)
-      // if (index !== -1) {
-      //   this.employeeForm.skills.splice(index, 1)
-      // }
-    },
     handleSubmitEmployee(employeeForm) {
-      this.$store.dispatch('employees/createEmployee', employeeForm)
+      if (this.selectedEmployee) {
+        this.$store.dispatch('employees/updateEmployee', employeeForm)
+      } else {
+        this.$store.dispatch('employees/createEmployee', employeeForm)
+      }
+    },
+    onClickEmployee(row, column, event) {
+      const mapToSnakeCase = false
+      this.selectedEmployee = mapData(row, mapToSnakeCase)
+      this.drawerTitle = 'Edit Employee'
+      this.drawer = true
+    },
+    handleSearchFilter(searchTerm, filterTerm) {
+      console.log(searchTerm, filterTerm, "index")
+      this.$store.dispatch('employees/searchEmployees', {searchTerm, filterTerm})
     },
   },
 }

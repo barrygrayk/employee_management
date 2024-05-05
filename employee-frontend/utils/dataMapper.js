@@ -9,22 +9,28 @@ export function toSnakeCase(str) {
     .replace(/^_/, ""); // Remove leading underscore
 }
 
+export function toCamelCase(str) {
+  return str
+    .replace(/([-_][a-z])/g, (group) => group.toUpperCase() // Convert underscore + lowercase letter to uppercase letter
+    .replace(/[-_]/, '')); // Remove underscore
+}
+
 /**
  * Recursively maps the keys of an object (and nested objects) from camelCase to snake_case.
  * @param {Object} data - The object to map.
  * @returns {Object} The mapped object.
  */
-export function mapData(data) {
+export function mapData(data, convertToSnakeCase = true) {
   return Object.entries(data).reduce((mappedData, [key, value]) => {
-    const snakeCaseKey = toSnakeCase(key);
+    const caseKey = convertToSnakeCase ? toSnakeCase(key) : toCamelCase(key);
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      mappedData[snakeCaseKey] = mapData(value);
+      mappedData[caseKey] = mapData(value, convertToSnakeCase);
     }
     else if (key === 'skills' && Array.isArray(value)) {
-      mappedData[snakeCaseKey] = value.map(mapData);
+      mappedData[caseKey] = value.map(skill => mapData(skill, convertToSnakeCase));
     }
     else {
-      mappedData[snakeCaseKey] = value;
+      mappedData[caseKey] = value;
     }
 
     return mappedData;
