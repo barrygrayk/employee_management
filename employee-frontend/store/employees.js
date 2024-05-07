@@ -19,7 +19,7 @@ export const mutations = {
   },
   CREATE_EMPLOYEE(state, employee) {
     state.employees.push(employee);
-    state.successMessage = 'Employee created successfully.'
+    state.successMessage = `Employee created successfully - ${employee.employee_code}.`
     state.errorMessage = null;
     state.loading = false;
   },
@@ -33,7 +33,7 @@ export const mutations = {
     if (itemIndex !== -1) {
       state.employees[itemIndex] = employee;
     }
-    state.successMessage = 'Employee updated successfully.'
+    state.successMessage = `Employee updated successfully - ${employee.employee_code}.`
     state.errorMessage = null;
     state.loading = false;
   },
@@ -70,7 +70,7 @@ export const actions = {
     let mappedEmployeeData = mapData(employeeData);
     await this.$axios.put(`/employees/${employeeData.id}/`, mappedEmployeeData)
     .then((employee) => {
-      commit('UPDATE_EMPLOYEE', employee);
+      commit('UPDATE_EMPLOYEE', employee.data);
     })
     .catch(error => {
       commit('ERROR', error);
