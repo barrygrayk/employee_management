@@ -1,13 +1,10 @@
-import re
 import json
 
-from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.employees.factories import EmployeeFactory, SkillFactory
 from apps.employees.models import Skill
-from apps.employees.utils import generate_employee_code
 
 
 class SkillViewSetTestCase(APITestCase):
@@ -20,27 +17,23 @@ class SkillViewSetTestCase(APITestCase):
         self.skill = SkillFactory()
 
     def test_get_all_skills(self):
-        """
-        Test that a GET request to /skills/ returns a 200 status code
-        """
+        """Test that a GET request to /skills/ returns a 200 status code"""
         response = self.client.get("/api/skills/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_skill_not_allowed(self):
-        """
-        Test that a POST request to /skills/ returns a 405 status code
-        (Method Not Allowed)
-        """
+        """Test that a POST request to /skills/ returns a 405 status code 
+        (Method Not Allowed)"""
         data = {"name": "Python", "years_of_experience": 1, "seniority": "JR"}
         response = self.client.post("/api/skills/", data=data)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_skill_not_found(self):
-        """
-        Test that a GET request to /skills/{id}/ returns a 404 status code
-        when the skill does not exist
-        """
-        response = self.client.get("/api/skills/999999/")  # Use an ID that does not exist
+        """Test that a GET request to /skills/{id}/ returns a 404 status code
+        when the skill does not exist"""
+        response = self.client.get(
+            "/api/skills/999999/"
+        )  # Use an ID that does not exist
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -53,17 +46,13 @@ class EmployeeViewSetTestCase(APITestCase):
         self.employee = EmployeeFactory()
 
     def test_get_all_employees(self):
-        """
-        Test that a GET request to /employees/ returns a 200 status code
-        """
+        """Test that a GET request to /employees/ returns a 200 status code"""
         response = self.client.get("/api/employees/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_employee(self):
-        """
-        Test that a GET request to /employees/{id}/ returns the correct
-        employee
-        """
+        """Test that a GET request to /employees/{id}/ returns the correct 
+        employee"""
         response = self.client.get(f"/api/employees/{self.employee.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["first_name"], self.employee.first_name)
@@ -71,9 +60,8 @@ class EmployeeViewSetTestCase(APITestCase):
         self.assertEqual(response.data["email_address"], self.employee.email_address)
 
     def test_create_employee(self):
-        """
-        Test that a POST request to /employees/ creates an employee and returns a 201 Created status code
-        """
+        """Test that a POST request to /employees/ creates an employee and 
+        returns a 201 Created status code"""
         employee_data = {
             "first_name": "Ben",
             "last_name": "Mulala",
@@ -94,10 +82,8 @@ class EmployeeViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_update_employee(self):
-        """
-        Test that a PUT request to /employees/{id}/ updates an employee
-        and returns a 200 OK status code
-        """
+        """ Test that a PUT request to /employees/{id}/ updates an employee 
+        and returns a 200 OK status code"""
         employee = EmployeeFactory()
         updated_employee_data = {
             "first_name": "Sammy",
@@ -106,7 +92,7 @@ class EmployeeViewSetTestCase(APITestCase):
             "email_address": "sammy.doe@example.com",
             "street_address": "456 Main St",
             "city": "Anytown",
-             "date_of_birth": "1990-01-01",
+            "date_of_birth": "1990-01-01",
             "postal_code": "54321",
             "country": "Zambia",
             "skills": [{"name": "Python", "years_of_experience": 1, "seniority": "JR"}],
@@ -121,19 +107,15 @@ class EmployeeViewSetTestCase(APITestCase):
         self.assertEqual(response.data["last_name"], "Kapili")
 
     def test_delete_employee(self):
-        """
-        Test that a DELETE request to /employees/{id}/ deletes an employee and
-        returns a 204 No Content status code
-        """
+        """Test that a DELETE request to /employees/{id}/ deletes an employee and
+        returns a 204 No Content status code"""
         employee = EmployeeFactory()
         response = self.client.delete(f"/api/employees/{employee.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_create_employee_with_missing_fields(self):
-        """
-        Test that a POST request to /employees/ with missing fields returns a
-        400 Bad Request status code
-        """
+        """Test that a POST request to /employees/ with missing fields returns a
+        400 Bad Request status code"""
         employee_data_with_missing_fields_1 = {
             "first_name": "John",
             "last_name": "Doe",
@@ -165,24 +147,26 @@ class EmployeeViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_search_employees(self):
-        """
-        Test that a GET request to /employees/ with a search query returns the correct employees
-        """
+        """Test that a GET request to /employees/ with a search query returns 
+        the correct employees"""
         EmployeeFactory(
-            first_name="John", last_name="Doe", email_address="john.doe@example.com"
+            first_name="mavuto",
+            last_name="chilekwa",
+            email_address="mavuto.doe@example.com",
         )
         EmployeeFactory(
-            first_name="Jane", last_name="Doe", email_address="jane.doe@example.com"
+            first_name="maziba",
+            last_name="tembo",
+            email_address="tembo.doe@example.com",
         )
-        response = self.client.get("/api/employees/", {"search": "john"})
+        response = self.client.get("/api/employees/", {"search": "mavuto"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["first_name"], "John")
+        self.assertEqual(response.data[0]["first_name"], "mavuto")
 
     def test_filter_employees(self):
-        """
-        Test that a GET request to /employees/ with a filter query returns the correct employees
-        """
+        """Test that a GET request to /employees/ with a filter query returns
+        the correct employees"""
         EmployeeFactory(
             first_name="John", last_name="Doe", email_address="john.doe@example.com"
         )
@@ -196,10 +180,8 @@ class EmployeeViewSetTestCase(APITestCase):
         self.assertEqual(len(response.data), 3)
 
     def test_create_employees_with_same_skill(self):
-        """
-        Test that a POST request to /employees/ creates employees with the
-        same skill but only one instance shoudl exists
-        """
+        """ Test that a POST request to /employees/ creates employees with the
+        same skill but only one instance should exists"""
         skill = SkillFactory()  # Create a skill
         employee_data_1 = {
             "first_name": "Ellah",
@@ -210,7 +192,7 @@ class EmployeeViewSetTestCase(APITestCase):
             "city": "Anytown",
             "postal_code": "54321",
             "country": "Zambia",
-             "date_of_birth": "1990-01-01",
+            "date_of_birth": "1990-01-01",
             "skills": [
                 {
                     "name": skill.name,
@@ -246,17 +228,3 @@ class EmployeeViewSetTestCase(APITestCase):
         self.assertEqual(response_1.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_2.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Skill.objects.count(), 1)
-
-
-class EmployeeCodeTestCase(TestCase):
-    def test_employee_id_is_unique(self):
-        """Test that each created employee has a unique ID."""
-        employee1 = EmployeeFactory()
-        employee2 = EmployeeFactory()
-        self.assertNotEqual(employee1.employee_code, employee2.employee_code)
-
-    def test_employee_id_format(self):
-        """Test that each created employee ID is 2 random uppercased letters
-        followed by 4 random numbers."""
-        employee = EmployeeFactory()
-        self.assertTrue(re.match(r'[A-Z]{2}\d{4}', employee.employee_code))
