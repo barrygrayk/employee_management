@@ -9,8 +9,6 @@ export const state = () => ({
   successMessage: null,
 });
 
-
-
 export const mutations = {
   SET_LOADING(state, value) {
     state.loading = value;
@@ -23,6 +21,7 @@ export const mutations = {
     state.employees.push(employee);
     state.successMessage = 'Employee created successfully.'
     state.errorMessage = null;
+    state.loading = false;
   },
   ERROR(state, message) {
     state.errorMessage = message;
@@ -52,6 +51,8 @@ export const actions = {
   },
   async createEmployee({ commit }, employeeData) {
     commit('SET_LOADING', true);
+    const dateOfBirth = moment(employeeData.dateOfBirth).format('YYYY-MM-DD');
+    employeeData.dateOfBirth = dateOfBirth;
     let mappedEmployeeData = mapData(employeeData);
     this.$axios.post("/employees/", mappedEmployeeData)
     .then((employee) => {
@@ -78,8 +79,7 @@ export const actions = {
 
   async searchEmployees({ commit }, terms) {
     commit('SET_LOADING', true);
-    console.log(terms)
-    const query = buildQueryString({ search: terms.searchTerm, filter: terms.filterTerm });
+    const query = buildQueryString({ search: terms.searchTerm, ordering: terms.filterTerm });
     await this.$axios.get(`/employees/?${query}`)
       .then(response => {
         commit('SET_EMPLOYEES', response.data);
