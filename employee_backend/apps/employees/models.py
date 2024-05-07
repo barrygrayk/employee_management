@@ -1,6 +1,6 @@
 import uuid
 
-from apps.employees.enums import SENIORITY_CHOICES, SeniorityLevel
+from apps.employees.enums import SeniorityLevel
 from apps.employees.utils import generate_employee_code
 from django.db import models
 from django.utils import timezone
@@ -11,12 +11,20 @@ class Skill(models.Model):
     Skill model represents a particular skill that an employee can have.
     Each skill has a unique name, years of experience and a seniority level.
     """
+    JR = "JR"
+    IN = "IN"
+    SR = "SR"
+    SENIORITY_CHOICES = {
+        JR: "Junior",
+        IN: "Senior",
+        SR: "Senior",
+    }
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
     years_of_experience = models.IntegerField()
     seniority = models.CharField(
-        max_length=2, choices=SENIORITY_CHOICES, default=SeniorityLevel.JUNIOR.value
+        max_length=2, choices=SENIORITY_CHOICES, default=JR
     )
 
     class Meta:
