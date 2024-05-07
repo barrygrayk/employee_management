@@ -23,6 +23,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "mobile_number",
+            "employee_code",
             "email_address",
             "street_address",
             "date_of_birth",
