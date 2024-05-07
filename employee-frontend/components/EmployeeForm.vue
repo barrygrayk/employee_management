@@ -32,6 +32,7 @@
             type="date"
             placeholder="Pick a date"
             v-model="employeeForm.dateOfBirth"
+            :picker-options="pickerOptions"
             style="width: 100%"
             format="yyyy-MM-dd"
           ></el-date-picker>
@@ -102,7 +103,7 @@
           }"
 
         >
-          <el-select v-model="skill.seniority" placeholder="Select">
+          <el-select v-model="skill.seniority">
             <el-option
               v-for="seniority in seniorityOptions"
               :key="seniority.value"
@@ -114,18 +115,13 @@
         </el-form-item>
       </el-col>
       <el-col :span="2">
-        <el-button
-          type="danger"
-          @click.prevent="removeSkill(skill)"
-          icon="el-icon-delete"
-          circle
-        ></el-button>
+          <i class="el-icon-delete-solid center-icon" @click.prevent="removeSkill(skill)"></i>
       </el-col>
     </el-row>
     <el-row>
       <el-col :span="24">
         <el-button
-          type="primary"
+          type="info"
           style="width: 100%"
           @click.prevent="addSkill()"
           icon="el-icon-plus"
@@ -134,12 +130,15 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="24">
+      <el-col :span="24" class="align-right">
         <el-button
+          class="submit-button"
           v-loading="loading"
           type="primary"
+          round
+          icon="el-icon-plus"
           @click="onSubmitEmployee('employeeForm')"
-          >Save and Add Skill</el-button
+          >Save and Add Employee</el-button
         >
       </el-col>
     </el-row>
@@ -154,6 +153,13 @@ export default {
     return {
       drawer: false,
       drawerTitle: 'New Employee',
+      pickerOptions: {
+        disabledDate(time) {
+          const eighteenYearsAgo = new Date();
+          eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 1);
+          return time.getTime() > eighteenYearsAgo.getTime();
+        },
+      },
       seniorityOptions: [
         {
           value: 'JR',
@@ -174,6 +180,7 @@ export default {
         lastName: '',
         dateOfBirth: '',
         emailAddress: '',
+        mobileNumber: '',
         streetAddress: '',
         city: '',
         postalCode: '',
@@ -197,7 +204,14 @@ export default {
         lastName: [
           {
             required: true,
-            message: 'Please enter your first last name',
+            message: 'Please enter your last name',
+            trigger: 'blur',
+          },
+        ],
+        mobileNumber: [
+          {
+            required: true,
+            message: 'Please enter your contact number',
             trigger: 'blur',
           },
         ],
@@ -264,6 +278,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    clearEmployeeForm: {
+      type: Boolean,
+      default: false,
+    },
     errorMessage: {
       type: String,
       default: null,
@@ -298,6 +316,7 @@ export default {
             lastName: '',
             dateOfBirth: '',
             emailAddress: '',
+            mobileNumber: '',
             streetAddress: '',
             city: '',
             postalCode: '',
@@ -312,6 +331,11 @@ export default {
           };
         }
       },
+    },
+    clearEmployeeForm(clearForm) {
+      if (clearForm) {
+        this.resetForm();
+      }
     },
   },
   methods: {
@@ -329,17 +353,33 @@ export default {
       })
     },
     onSubmitEmployee() {
-      console.log(this.employeeForm)
       this.$refs.employeeForm.validate((valid) => {
         if (valid) {
-          // console.log(this.employeeForm)
-          // const dateOfBirth = moment(this.employeeForm.dateOfBirth).format('YYYY-MM-DD')
-          // console.log(this.employeeForm)
-          // this.employeeForm.dateOfBirth = dateOfBirth
           this.$emit('submit', this.employeeForm)
         }
       })
     },
+    resetForm() {
+      this.$refs.employeeForm.resetFields();
+    }
   },
 }
 </script>
+</script>
+
+<style scoped>
+.left-align {
+  float: left;
+}
+.employee-form {
+  padding: 20px;
+}
+.center-icon {
+ padding-top: 60px;
+}
+.align-right {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+}
+</style>
