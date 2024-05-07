@@ -1,9 +1,9 @@
 <template>
-  <el-row :gutter="20">
+  <el-row :gutter="20" class="center-row">
     <el-col :span="4">
       <h2>Employees</h2>
     </el-col>
-    <el-col :span="8">
+    <el-col :span="12">
       <el-input
         placeholder="Search"
         v-model="searchTerm"
@@ -12,7 +12,7 @@
         <i slot="prefix" class="el-input__icon el-icon-search"></i>
       </el-input>
     </el-col>
-    <el-col :span="4">
+    <el-col :span="6">
       <el-select v-model="filterTerm" placeholder="Filter By" @change="onSearchFilterEmployee">
         <el-option
           v-for="item in filterOptions"
@@ -23,13 +23,13 @@
         </el-option>
       </el-select>
     </el-col>
-    <el-col :span="4">
+    <el-col :span="4" class="align-right">
       <el-button
         type="primary"
         round
         icon="el-icon-plus"
         @click="openCustomerDrawer()"
-        >Employee</el-button
+        >New Employee</el-button
       >
     </el-col>
   </el-row>
@@ -70,3 +70,14 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.center-row {
+  display: flex;
+  align-items: center;
+}
+.align-right {
+  display: flex;
+  justify-content: flex-end;
+}
+</style>
