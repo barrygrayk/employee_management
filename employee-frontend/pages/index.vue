@@ -81,6 +81,7 @@ export default {
       this.drawer = true
     },
     handleSubmitEmployee(employeeForm) {
+      this.clearEmployeeForm = false
       if (this.selectedEmployee) {
         this.$store.dispatch('employees/updateEmployee', employeeForm)
       } else {
