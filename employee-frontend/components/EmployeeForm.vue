@@ -132,7 +132,7 @@
     <el-row>
       <el-col :span="24" class="align-right">
         <el-button
-          class="submit-button"
+          class="purple-button"
           v-loading="loading"
           type="primary"
           round
@@ -381,5 +381,13 @@ export default {
   display: flex;
   justify-content: flex-end;
   padding-top: 20px;
+}
+.purple-button {
+  background-color: #7030a0;
+  border-color: #7030a0;
+}
+.purple-button:hover {
+  background-color: #5b2480;
+  border-color: #5b2480;
 }
 </style>

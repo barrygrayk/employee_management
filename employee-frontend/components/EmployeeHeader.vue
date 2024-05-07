@@ -27,6 +27,7 @@
       <el-button
         type="primary"
         round
+        class="purple-button"
         icon="el-icon-plus"
         @click="openCustomerDrawer()"
         >New Employee</el-button
@@ -79,5 +80,13 @@ export default {
 .align-right {
   display: flex;
   justify-content: flex-end;
+}
+.purple-button {
+  background-color: #7030a0;
+  border-color: #7030a0;
+}
+.purple-button:hover {
+  background-color: #5b2480;
+  border-color: #5b2480;
 }
 </style>
