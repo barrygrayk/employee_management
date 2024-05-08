@@ -6,15 +6,14 @@ describe('EmployeeHeader.vue', () => {
 
   beforeEach(() => {
     wrapper = shallowMount(EmployeeHeader, {
-        stubs: {
-          'el-button': true,
-          'el-form': {
-            template: '<div />',
-            methods: {
-              validate: (callback) => callback(true),
-            },
-          },
-        },
+      stubs: {
+        'el-col': true,
+        'el-row': true,
+        'el-button': true,
+        'el-input': true,
+        'el-option': true,
+        'el-select': true,
+      }
     });
   });
 

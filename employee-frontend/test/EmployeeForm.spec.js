@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import EmployeeForm from '@/components/EmployeeForm.vue';
+import ElForm from 'element-ui/lib/form'
 
 describe('EmployeeForm.vue', () => {
   let wrapper;
@@ -29,6 +30,13 @@ describe('EmployeeForm.vue', () => {
         'el-col': true,
         'el-row': true,
         'el-button': true,
+        'el-input': true,
+        'el-option': true,
+        'el-select': true,
+        'el-dialog': true,
+        'el-form': ElForm,
+        'el-form-item': true,
+        'el-date-picker': true,
       },
       directives: {
         loading: () => {},
@@ -81,4 +89,5 @@ describe('EmployeeForm.vue', () => {
     // Check if the skill was removed from the array
     expect(wrapper.vm.employeeForm.skills).not.toContain(skill);
   });
+  
 });
