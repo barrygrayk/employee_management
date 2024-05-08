@@ -101,7 +101,6 @@
             message: 'Seniority is required',
             trigger: 'blur',
           }"
-
         >
           <el-select v-model="skill.seniority">
             <el-option
@@ -115,7 +114,10 @@
         </el-form-item>
       </el-col>
       <el-col :span="2">
-          <i class="el-icon-delete-solid center-icon" @click.prevent="removeSkill(skill)"></i>
+        <i
+          class="el-icon-delete-solid center-icon"
+          @click.prevent="removeSkill(skill)"
+        ></i>
       </el-col>
     </el-row>
     <el-row>
@@ -130,7 +132,28 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="24" class="align-right">
+      <el-col :span="4"  class="delete-emp">
+        <el-button
+        type="danger"
+        icon="el-icon-delete-solid"
+        @click="deleteEmployeeVisible = true"
+        round
+          >Delete</el-button
+        >
+      <el-dialog
+        title="Delete Employee"
+        :visible.sync="deleteEmployeeVisible"
+        width="20%"
+        :append-to-body="true"
+        center>
+        <span>Are you sure you want to delete {{employeeForm.firstName }}?</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="deleteEmployeeVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="deleteEmployee()">Confirm</el-button>
+        </span>
+      </el-dialog>
+      </el-col>
+      <el-col :span="20" class="align-right">
         <el-button
           class="purple-button"
           v-loading="loading"
@@ -146,18 +169,18 @@
 </template>
 
 <script>
-
 export default {
   name: 'EmployeeForm',
   data() {
     return {
       drawer: false,
+      deleteEmployeeVisible: false,
       drawerTitle: 'New Employee',
       pickerOptions: {
         disabledDate(time) {
-          const eighteenYearsAgo = new Date();
-          eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 1);
-          return time.getTime() > eighteenYearsAgo.getTime();
+          const eighteenYearsAgo = new Date()
+          eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 1)
+          return time.getTime() > eighteenYearsAgo.getTime()
         },
       },
       seniorityOptions: [
@@ -297,8 +320,10 @@ export default {
   },
   async mounted() {
     if (this.selectedEmployee) {
-      this.employeeForm = this.selectedEmployee;
-      this.employeeForm.dateOfBirth = new Date(this.selectedEmployee.dateOfBirth);
+      this.employeeForm = this.selectedEmployee
+      this.employeeForm.dateOfBirth = new Date(
+        this.selectedEmployee.dateOfBirth
+      )
     }
   },
 
@@ -307,8 +332,8 @@ export default {
       immediate: true,
       handler(employee) {
         if (employee) {
-          this.employeeForm = { ...employee };
-          this.employeeForm.dateOfBirth = new Date(employee.dateOfBirth);
+          this.employeeForm = { ...employee }
+          this.employeeForm.dateOfBirth = new Date(employee.dateOfBirth)
         } else {
           this.employeeForm = {
             id: '',
@@ -328,13 +353,13 @@ export default {
                 seniority: '',
               },
             ],
-          };
+          }
         }
       },
     },
     clearEmployeeForm(clearForm) {
       if (clearForm) {
-        this.resetForm();
+        this.resetForm()
       }
     },
   },
@@ -352,6 +377,10 @@ export default {
         seniority: '',
       })
     },
+    deleteEmployee() {
+      this.$emit('deleteEmployee', this.employeeForm)
+      this.deleteEmployeeVisible = false
+    },
     onSubmitEmployee() {
       this.$refs.employeeForm.validate((valid) => {
         if (valid) {
@@ -360,11 +389,10 @@ export default {
       })
     },
     resetForm() {
-      this.$refs.employeeForm.resetFields();
-    }
+      this.$refs.employeeForm.resetFields()
+    },
   },
 }
-</script>
 </script>
 
 <style scoped>
@@ -375,7 +403,7 @@ export default {
   padding: 20px;
 }
 .center-icon {
- padding-top: 60px;
+  padding-top: 60px;
 }
 .align-right {
   display: flex;
@@ -389,5 +417,8 @@ export default {
 .purple-button:hover {
   background-color: #5b2480;
   border-color: #5b2480;
+}
+.delete-emp {
+  padding-top: 20px;
 }
 </style>
