@@ -12,6 +12,8 @@ export const state = () => ({
 export const mutations = {
   SET_LOADING(state, value) {
     state.loading = value;
+    state.errorMessage = null;
+    state.successMessage = null
   },
   SET_EMPLOYEES(state, employees) {
     state.employees = employees;
@@ -31,14 +33,18 @@ export const mutations = {
   UPDATE_EMPLOYEE(state, employee) {
     const itemIndex = state.employees.findIndex((employee) => employee.id === employee.id);
     if (itemIndex !== -1) {
-      state.employees[itemIndex] = employee;
+      state.employees.splice(itemIndex, 1, employee);
     }
     state.successMessage = `Employee updated successfully - ${employee.employee_code}.`
     state.errorMessage = null;
     state.loading = false;
   },
-  DELETE_EMPLOYEE(state, employeeId) {
-    state.employees = state.items.filter((item) => item.id !== itemId);
+  DELETE_EMPLOYEE(state, deletedEmployee) {
+    console.log(deletedEmployee, "-->");
+    state.employees = state.employees.filter((employee) => employee.id !== deletedEmployee.id);
+    state.successMessage = `Employee deleted successfully - ${deletedEmployee.employeeCode}.`
+    state.errorMessage = null;
+    state.loading = false;
   },
 };
 
@@ -89,11 +95,14 @@ export const actions = {
         commit('ERROR', error);
       });
   },
-  async deleteEmployee({ commit }, employeeId) {
-    await this.$axios.delete(`/employees/${employeeId}`);
-    commit('DELETE_EMPLOYEE', employeeId);
-    commit('SET_EMPLOYEES', response.data);
-    commit('SET_LOADING', false);
+  async deleteEmployee({ commit }, employee) {
+    await this.$axios.delete(`/employees/${employee.id}`)
+    .then(() => {
+      commit('DELETE_EMPLOYEE', employee);
+    })
+    .catch(error => {
+      commit('ERROR', error);
+    })
   },
 };
 
