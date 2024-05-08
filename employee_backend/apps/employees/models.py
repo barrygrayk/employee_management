@@ -1,6 +1,6 @@
+from sqlite3 import IntegrityError
 import uuid
 
-from apps.employees.enums import SeniorityLevel
 from apps.employees.utils import generate_employee_code
 from django.db import models
 from django.utils import timezone
@@ -11,21 +11,20 @@ class Skill(models.Model):
     Skill model represents a particular skill that an employee can have.
     Each skill has a unique name, years of experience and a seniority level.
     """
+
     JR = "JR"
     IN = "IN"
     SR = "SR"
     SENIORITY_CHOICES = {
         JR: "Junior",
-        IN: "Senior",
-        SR: "Senior",
+        IN: "Intermediate",
+        SR: "Senior ",
     }
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
     years_of_experience = models.IntegerField()
-    seniority = models.CharField(
-        max_length=2, choices=SENIORITY_CHOICES, default=JR
-    )
+    seniority = models.CharField(max_length=2, choices=SENIORITY_CHOICES, default=JR)
 
     class Meta:
         ordering = ["name"]
@@ -71,3 +70,36 @@ class Employee(models.Model):
         if Employee.objects.filter(employee_code=employee_code).exists():
             return self.generate_unique_employee_id()
         return employee_code
+
+    # def generate_unique_employee_id(self, max_attempts=5, attempt=0):
+    #     if attempt >= max_attempts:
+    #         raise Exception(
+    #             f"Could not generate a unique employee code after {max_attempts} attempts"
+    #         )
+
+    #     employee_id = generate_employee_code()
+    #     try:
+    #         employee = Employee.objects.create(id=employee_id)
+    #         return employee
+    #     except IntegrityError:
+    #         return self.generate_unique_employee_id(max_attempts, attempt + 1)
+        # def generate_unique_employee_id(self, max_attempts=5):
+    #     for _ in range(max_attempts):
+    #         employee_code = generate_employee_code()
+    #         if not Employee.objects.filter(employee_code=employee_code).exists():
+    #             return employee_code
+    #     raise Exception(
+    #         f"Could not generate a unique employee code after {max_attempts} attempts"
+    #     )
+
+    # def generate_unique_employee_id(self, max_attempts=5):
+    #     for _ in range(max_attempts):
+    #         employee_id = generate_employee_code()
+    #         try:
+    #             employee = Employee.objects.create(id=employee_id)
+    #             return employee
+    #         except IntegrityError:
+    #             continue
+    #     raise Exception(
+    #         f"Could not generate a unique employee code after {max_attempts} attempts"
+    #     )
