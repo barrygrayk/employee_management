@@ -32,7 +32,7 @@
     <el-empty
       v-if="!employees.length"
       image="/logo.png"
-      :image-size=400
+      :image-size="400"
       description="There is nothing here"
     >
       <p>
@@ -52,6 +52,7 @@ export default {
       drawerTitle: '',
       selectedEmployee: null,
       clearEmployeeForm: false,
+      centerDialogVisible: false,
     }
   },
   props: {

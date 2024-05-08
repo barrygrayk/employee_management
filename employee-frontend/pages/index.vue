@@ -2,15 +2,18 @@
   <el-container>
     <el-header style="padding: 10px">
       <EmployeeHeader
+        :employeeCountText="employeeCountText()"
         @searchFilter="handleSearchFilter"
         @open-drawer="handleOpenDrawer"
       />
     </el-header>
     <el-main>
       <EmployeeList
+        style="margin-top: 30px"
         :employees="employees"
         :loading="loading"
-        @selected-employee="handleEmployeeClick">
+        @selected-employee="handleEmployeeClick"
+      >
       </EmployeeList>
       <el-drawer
         ref="drawerContent"
@@ -27,6 +30,7 @@
           :clearEmployeeForm="clearEmployeeForm"
           :loading="loading"
           @submit="handleSubmitEmployee"
+          @deleteEmployee="handleDeleteEmployee"
         />
       </el-drawer>
     </el-main>
@@ -35,7 +39,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import { mapData } from '~/utils/dataMapper'
 export default {
   name: 'IndexPage',
   data() {
@@ -54,22 +57,22 @@ export default {
       errorMessage: (state) => state.employees.errorMessage,
       successMessage: (state) => state.employees.successMessage,
       loading: (state) => state.employees.loading,
+      employees: (state) => state.employees.employees,
     }),
-    employees() {
-      return this.$store.getters['employees/employees']
-    },
   },
   watch: {
     successMessage(message) {
+      this.clearEmployeeForm = true
+      if (!message) return
       this.$message({
         showClose: true,
         message: message,
         type: 'success',
       })
-      this.clearEmployeeForm = true
     },
 
     errorMessage(message) {
+      if (!message) return
       this.$message.error(message)
     },
   },
@@ -81,12 +84,18 @@ export default {
       this.drawer = true
     },
     handleSubmitEmployee(employeeForm) {
-      this.clearEmployeeForm = false
       if (this.selectedEmployee) {
+        this.clearEmployeeForm = false
         this.$store.dispatch('employees/updateEmployee', employeeForm)
       } else {
+        this.clearEmployeeForm = true
         this.$store.dispatch('employees/createEmployee', employeeForm)
       }
+    },
+    handleDeleteEmployee() {
+      this.$store.dispatch('employees/deleteEmployee', this.selectedEmployee)
+      this.clearEmployeeForm = true
+      this.drawer = false
     },
     handleClose(done) {
       this.drawer = false
@@ -103,6 +112,13 @@ export default {
         searchTerm,
         filterTerm,
       })
+    },
+    employeeCountText() {
+      return this.employees.length === 1
+        ? `There is ${this.employees.length} Employee`
+        : this.employees.length > 1
+        ? `There are ${this.employees.length} Employees`
+        : `No Employees`
     },
   },
 }
