@@ -2,6 +2,7 @@
   <el-row :gutter="20" class="center-row">
     <el-col :span="4">
       <h2>Employees</h2>
+      <small>{{ employeeCountText }}</small>
     </el-col>
     <el-col :span="12">
       <el-input
@@ -60,6 +61,12 @@ export default {
         },
       ],
     }
+  },
+  props: {
+    employeeCountText: {
+      type: String,
+      default: 'No Employees',
+    },
   },
   methods: {
     onSearchFilterEmployee() {
