@@ -26,16 +26,12 @@ describe('EmployeeForm.vue', () => {
         },
       },
       stubs: {
+        'el-col': true,
+        'el-row': true,
         'el-button': true,
-        'el-form': {
-          template: '<div />',
-          methods: {
-            validate: (callback) => callback(true),
-          },
-        },
       },
       directives: {
-        loading: () => {}, // Add this line
+        loading: () => {},
       },
     });
   });
@@ -60,7 +56,7 @@ describe('EmployeeForm.vue', () => {
         seniority: 'JR',
       },
     ]
-    await wrapper.vm.createEmployee();
+    await wrapper.vm.onSubmitEmployee();
     expect(wrapper.emitted().submit).toBeTruthy();
   });
   it('has all the required fields', () => {
