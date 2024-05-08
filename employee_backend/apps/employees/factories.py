@@ -1,4 +1,3 @@
-from apps.employees.utils import generate_employee_code
 import factory
 from apps.employees.enums import SENIORITY_CHOICES
 from apps.employees.models import Employee, Skill
