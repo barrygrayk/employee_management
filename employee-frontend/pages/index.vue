@@ -84,12 +84,13 @@ export default {
       this.drawer = true
     },
     handleSubmitEmployee(employeeForm) {
+      this.clearEmployeeForm = false
       if (this.selectedEmployee) {
-        this.clearEmployeeForm = false
         this.$store.dispatch('employees/updateEmployee', employeeForm)
       } else {
-        this.clearEmployeeForm = true
         this.$store.dispatch('employees/createEmployee', employeeForm)
+        this.drawer = false
+        this.clearEmployeeForm = true
       }
     },
     handleDeleteEmployee() {
