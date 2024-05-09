@@ -40,7 +40,6 @@ export const mutations = {
     state.loading = false;
   },
   DELETE_EMPLOYEE(state, deletedEmployee) {
-    console.log(deletedEmployee, "-->");
     state.employees = state.employees.filter((employee) => employee.id !== deletedEmployee.id);
     state.successMessage = `Employee deleted successfully - ${deletedEmployee.employeeCode}.`
     state.errorMessage = null;

@@ -1,7 +1,7 @@
-from sqlite3 import IntegrityError
 import uuid
 
 from apps.employees.utils import generate_employee_code
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -66,40 +66,14 @@ class Employee(models.Model):
         super().save(*args, **kwargs)
 
     def generate_unique_employee_id(self):
-        employee_code = generate_employee_code()
-        if Employee.objects.filter(employee_code=employee_code).exists():
-            return self.generate_unique_employee_id()
-        return employee_code
-
-    # def generate_unique_employee_id(self, max_attempts=5, attempt=0):
-    #     if attempt >= max_attempts:
-    #         raise Exception(
-    #             f"Could not generate a unique employee code after {max_attempts} attempts"
-    #         )
-
-    #     employee_id = generate_employee_code()
-    #     try:
-    #         employee = Employee.objects.create(id=employee_id)
-    #         return employee
-    #     except IntegrityError:
-    #         return self.generate_unique_employee_id(max_attempts, attempt + 1)
-        # def generate_unique_employee_id(self, max_attempts=5):
-    #     for _ in range(max_attempts):
-    #         employee_code = generate_employee_code()
-    #         if not Employee.objects.filter(employee_code=employee_code).exists():
-    #             return employee_code
-    #     raise Exception(
-    #         f"Could not generate a unique employee code after {max_attempts} attempts"
-    #     )
-
-    # def generate_unique_employee_id(self, max_attempts=5):
-    #     for _ in range(max_attempts):
-    #         employee_id = generate_employee_code()
-    #         try:
-    #             employee = Employee.objects.create(id=employee_id)
-    #             return employee
-    #         except IntegrityError:
-    #             continue
-    #     raise Exception(
-    #         f"Could not generate a unique employee code after {max_attempts} attempts"
-    #     )
+        """
+        Create a unique employee ID ensuring no duplicates in the database.
+        """
+        max_attempts = settings.MAX_CODE_GENERATION_ATTEMPTS
+        for _ in range(max_attempts):
+            employee_code = generate_employee_code()
+            if not Employee.objects.filter(employee_code=employee_code).exists():
+                return employee_code
+        raise ValueError(
+            "Unable to generate a unique employee ID after maximum attempts"
+        )

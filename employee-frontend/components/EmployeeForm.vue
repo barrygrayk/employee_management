@@ -382,6 +382,7 @@ export default {
       this.deleteEmployeeVisible = false
     },
     onSubmitEmployee() {
+      this.employeeForm.dateOfBirth = new Date(this.employeeForm.dateOfBirth)
       this.$refs.employeeForm.validate((valid) => {
         if (valid) {
           this.$emit('submit', this.employeeForm)
